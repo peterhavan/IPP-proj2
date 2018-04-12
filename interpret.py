@@ -42,6 +42,8 @@ def interpret(frameStack, instList):
     for instruction in instList:
         if instruction.name == "DEFVAR":
             frameStack.addVariable(instruction.args[0])
+        elif instruction.name == "MOVE":
+            frameStack.initVariable(instruction.args[0], instruction.args[1])
         
         
     
@@ -64,40 +66,48 @@ class variableTable:
         frameName = arg.split('@',1)[0]
         if frameName == "GF":
             self.GF.variables.get(arg.split('@',1)[1], "not init")
-            #self.GF.addVariable(arg.split('@',1)[1])
         elif frameName == "LF":
             if not self.LF:
                 exit(55)
             else:
                 self.LF.variables.get(arg.split('@',1)[1], "not init")
-                #self.LF.addVariable(arg.split('@',1)[1])
         elif frameName == "TF":
             self.TF.variables.get(arg.split('@',1)[1], "not init")
-            #self.TF.addVariable(arg.split('@',1)[1])
             
     def initVariable(self, name, value):
         frameName = name.split('@',1)[0]
         variableName = name.split('@',1)[1]
+        if str(value) == "None":
+            value = str()
+            
+        self.checkVariable(name)
+        
+        if frameName == "GF":
+            self.GF.variables.update({variableName : value})
+                
+        elif frameName == "LF":
+             self.LF.variables.update({variableName : value})
+                
+        elif frameName == "TF":
+            self.TF.variables.update({variableName : value})
+                
+    def checkVariable(self, variable):
+        frameName = variable.split('@',1)[0]
+        variableName = variable.split('@',1)[1]
         
         if frameName == "GF":
             if variableName not in self.GF.variables.keys():
                 exit(54)
-            else:
-                self.GF.variables.update({variableName : value})
                 
         elif frameName == "LF":
             if not self.LF:
                 exit(55)
             elif variableName not in self.LF.variables.keys():
                 exit(54)
-            else:
-                self.LF.variables.update({variableName : value})
                 
         elif frameName == "TF":
             if variableName not in self.TF.variables.keys():
                 exit(54)
-            else:
-                self.TF.variables.update({variableName : value})
             
             
         
@@ -107,7 +117,7 @@ class Instruction:
         self.name = name
         self.args = args
         
-        
+
     
     
 if __name__ == '__main__':
